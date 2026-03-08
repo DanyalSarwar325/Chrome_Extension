@@ -10,10 +10,10 @@
     ],
     "action": {
         "default_popup": "popup.html",
+        "default_title": "Autofill Extension",
         "default_icon": {
-        "16": "icons/icon16.png",
-        "48": "icons/icon48.png",
-        "128": "icons/icon128.png"
+        "16": "icons/icon16.png"
+        
         }
     },
     "background": {
@@ -21,7 +21,7 @@
     },
     "content_scripts": [
         {
-        "matches": ["https://ptc.eightfold.ai/careers/apply?pid=137477695724  "],
+        "matches": ["https://ptc.eightfold.ai/careers/apply/*"],
         "js": ["content.js"]
         }
     ]
