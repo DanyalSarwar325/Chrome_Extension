@@ -6,7 +6,8 @@
     "description": "An extension to autofill forms with predefined data.",
     "permissions": [
         "activeTab",
-        "storage"
+        "storage",
+        "scripting"
     ],
     "action": {
         "default_popup": "popup.html",
@@ -24,5 +25,11 @@
         "matches": ["https://ptc.eightfold.ai/careers/apply/*"],
         "js": ["content.js"]
         }
-    ]
+    ],
+     "web_accessible_resources": [
+    {
+      "resources": ["data.json"],
+      "matches":    ["*://*.eightfold.ai/*"]
+    }
+  ]
 }

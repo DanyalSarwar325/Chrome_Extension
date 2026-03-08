@@ -254,7 +254,7 @@
   </div>
 
   <!-- CTA -->
-  <button class="btn" id="autofillBtn" onclick="handleAutofill()">
+  <button class="btn" id="autofillBtn">
     <div class="btn-inner" id="btnContent">
       <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path d="M13 2L4.09 12.96A1 1 0 005 14.5h5.5L11 22l8.91-10.96A1 1 0 0019 9.5H13.5L13 2z"/>
@@ -268,37 +268,7 @@
 
 </div>
 
-<script>
-  function handleAutofill() {
-    const btn = document.getElementById('autofillBtn');
-    const content = document.getElementById('btnContent');
 
-    // Send message to content script
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      chrome.tabs.sendMessage(tabs[0].id, { action: 'autofill' });
-    });
-
-    // Visual feedback
-    btn.classList.add('success');
-    content.innerHTML = `
-      <svg viewBox="0 0 24 24" fill="white" width="15" height="15">
-        <path d="M20 6L9 17l-5-5"/>
-        <polyline points="20 6 9 17 4 12" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-      </svg>
-      Autofilled!
-    `;
-
-    setTimeout(() => {
-      btn.classList.remove('success');
-      content.innerHTML = `
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="white">
-          <path d="M13 2L4.09 12.96A1 1 0 005 14.5h5.5L11 22l8.91-10.96A1 1 0 0019 9.5H13.5L13 2z"/>
-        </svg>
-        Autofill Now
-      `;
-    }, 2500);
-  }
-</script>
-
+  <script src="popup.js"></script>
 </body>
 </html>
