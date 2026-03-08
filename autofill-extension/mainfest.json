@@ -1,2 +1,28 @@
- .
  
+{
+    "manifest_version": 3,
+    "name": "Autofill Extension",
+    "version": "1.0",
+    "description": "An extension to autofill forms with predefined data.",
+    "permissions": [
+        "activeTab",
+        "storage"
+    ],
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
+        }
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+        "matches": ["https://ptc.eightfold.ai/careers/apply?pid=137477695724  "],
+        "js": ["content.js"]
+        }
+    ]
+}
