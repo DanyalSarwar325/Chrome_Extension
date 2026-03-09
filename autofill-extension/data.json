@@ -3,7 +3,7 @@
   "firstName": "John",
   "lastName": "Doe",
   "email": "john.doe@example.com",
-  "phoneType": "+1",
+  "phoneType": "mobile",
   "phoneNumber": "5551234567",
   "commonQuestions": {
     "howDidYouHear": "LinkedIn"

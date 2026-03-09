@@ -2,6 +2,7 @@
 // Eightfold Autofill - content.js
 // ============================================
 
+
 // Helper: Fill a standard text input (handles React/Vue controlled inputs)
 function fillInput(selector, value) {
   const el = document.querySelector(selector);
@@ -24,6 +25,38 @@ function fillInput(selector, value) {
 
   console.log(`[Autofill] ✅ Filled: ${selector} → "${value}"`);
   return true;
+}
+
+async function fillDropdown(selector, value) {
+  const field = document.querySelector(selector);
+  if (!field) return;
+
+  field.click();
+  field.focus();
+  await new Promise(r => setTimeout(r, 600));
+
+  const options = document.querySelectorAll('[role="option"]');
+  const valueLower = value.toLowerCase();
+
+  // First try exact match
+  for (let option of options) {
+    if (option.textContent.trim().toLowerCase() === valueLower) {
+      option.click();
+      console.log(`[Autofill] ✅ Exact match: "${value}"`);
+      return;
+    }
+  }
+
+  // Fall back to partial match
+  for (let option of options) {
+    if (option.textContent.trim().toLowerCase().includes(valueLower)) {
+      option.click();
+      console.log(`[Autofill] ✅ Partial match: "${value}"`);
+      return;
+    }
+  }
+
+  console.warn(`[Autofill] ⚠️ No match found for: "${value}"`);
 }
 
 // Helper: Fill phone type combobox (custom dropdown)
@@ -102,6 +135,54 @@ async function autofill() {
 
   // ----- PHONE NUMBER -----
   fillInput('[data-test-id="Contact_Information_phone"]', data.phoneNumber);
+
+  //Source
+
+  // Normalize 'howDidYouHear' for dropdown: accept 'LinkedIn' (any case), send 'Linkedin' to application
+  let howDidYouHear = data.commonQuestions.howDidYouHear;
+  if (typeof howDidYouHear === 'string' && howDidYouHear.trim().toLowerCase() === 'linkedin') {
+    howDidYouHear = 'Linkedin';
+  }
+  await fillDropdown('[aria-labelledby="Source_Applicant_Source_ID_label"]', howDidYouHear);
+
+   //Relocation
+  fillInput('[aria-labelledby="Relocation_Relocation_label"]', data.willingToRelocate);
+
+    //city
+  fillInput('[data-test-id="Address_City"]', data.currentAddress.city);
+
+   //State
+  fillInput('[data-test-id="Address_State"]', data.currentAddress.state);
+
+   //Zip code
+  fillInput('[data-test-id="Address_Postal_Code"]', data.currentAddress.zipCode);
+
+     //Country
+  fillInput('[aria-labelledby="Address_Country_Reference_label"]', data.currentAddress.country);
+
+ //Salary
+  fillInput('[data-test-id="Application_questions_apac_annual_salary"]', data.desiredSalary);
+
+ // Helper: convert boolean to Yes/No
+function boolToYesNo(value) {
+  return value === true ? 'Yes' : 'No';
+}
+
+// Authorize To Work
+await fillDropdown(
+  '[aria-labelledby="Position_Specific_Questions_QUESTION_SETUP_6_24_label"]',
+  boolToYesNo(data.authorizedToWork)  // true → "Yes"
+);
+
+// Sponsorship
+await fillDropdown(
+  '[aria-labelledby="Position_Specific_Questions_QUESTION_SETUP_6_25_label"]',
+  boolToYesNo(data.requireSponsorship)  // false → "No"
+);
+
+await fillDropdown(
+    '[aria-labelledby="Source_Applicant_Source_ID_label"]', (data.commonQuestions.howDidYouHear)
+)
 
   console.log('[Autofill] 🎉 Autofill complete!');
 }
