@@ -28,7 +28,7 @@ async function handleAutofill() {
 
     // Send autofill message to content.js
     // ❌ Current - waits for response and times out
-const response = await chrome.tabs.sendMessage(tab.id, { action: 'autofill' });
+// const response = await chrome.tabs.sendMessage(tab.id, { action: 'autofill' });
 
 // ✅ Fixed - fire and forget, don't await response
 chrome.tabs.sendMessage(tab.id, { action: 'autofill' });

@@ -29,30 +29,37 @@ function fillInput(selector, value) {
 
 async function fillDropdown(selector, value) {
   const field = document.querySelector(selector);
-  if (!field) return;
+  if (!field) {
+    console.warn(`[Autofill] Dropdown not found: ${selector}`);
+    return;
+  }
 
   field.click();
   field.focus();
+
+  // Wait for dropdown options to render
   await new Promise(r => setTimeout(r, 600));
 
   const options = document.querySelectorAll('[role="option"]');
-  const valueLower = value.toLowerCase();
+  const valueLower = value.toLowerCase().trim();
 
-  // First try exact match
+  // Try exact match first
   for (let option of options) {
     if (option.textContent.trim().toLowerCase() === valueLower) {
+      option.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
       option.click();
-      console.log(`[Autofill] ✅ Exact match: "${value}"`);
-      return;
+      console.log(`[Autofill] ✅ Exact match selected: "${value}"`);
+      return; // ← Stop immediately after clicking once
     }
   }
 
   // Fall back to partial match
   for (let option of options) {
     if (option.textContent.trim().toLowerCase().includes(valueLower)) {
+      option.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
       option.click();
-      console.log(`[Autofill] ✅ Partial match: "${value}"`);
-      return;
+      console.log(`[Autofill] ✅ Partial match selected: "${value}"`);
+      return; // ← Stop immediately after clicking once
     }
   }
 
@@ -148,6 +155,9 @@ async function autofill() {
    //Relocation
   fillInput('[aria-labelledby="Relocation_Relocation_label"]', data.willingToRelocate);
 
+  //Address
+  fillInput('[data-test-id="Address_Address_Line_1"]', data.currentAddress.street);
+
     //city
   fillInput('[data-test-id="Address_City"]', data.currentAddress.city);
 
@@ -161,7 +171,7 @@ async function autofill() {
   fillInput('[aria-labelledby="Address_Country_Reference_label"]', data.currentAddress.country);
 
  //Salary
-  fillInput('[data-test-id="Application_questions_apac_annual_salary"]', data.desiredSalary);
+  fillInput('[data-test-id="Application_questions_us_annual_salary"]', data.desiredSalary);
 
  // Helper: convert boolean to Yes/No
 function boolToYesNo(value) {
@@ -180,9 +190,7 @@ await fillDropdown(
   boolToYesNo(data.requireSponsorship)  // false → "No"
 );
 
-await fillDropdown(
-    '[aria-labelledby="Source_Applicant_Source_ID_label"]', (data.commonQuestions.howDidYouHear)
-)
+
 
   console.log('[Autofill] 🎉 Autofill complete!');
 }
