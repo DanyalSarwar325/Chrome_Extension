@@ -22,7 +22,10 @@
     },
     "content_scripts": [
         {
-        "matches": ["https://ptc.eightfold.ai/careers/apply/*"],
+                "matches": [
+                    "https://ptc.eightfold.ai/careers/apply*",
+                    "https://ptc.eightfold.ai/careers/apply/*"
+                ],
         "js": ["content.js"]
         }
     ],

@@ -1,5 +1,5 @@
 {
-  "resumeUrl": "https://example.com/resume.pdf",
+  "resumeUrl": "https://raw.githubusercontent.com/DanyalSarwar325/resume/main/Danyal_Resume.pdf",
   "firstName": "John",
   "lastName": "Doe",
   "email": "john.doe@example.com",
@@ -13,7 +13,7 @@
   "disabilityStatus": "No",
   "veteranStatus": "Not a Veteran",
   "willingToRelocate": true,
-  "coverLetterUrl": "https://example.com/coverletter.pdf",
+"coverLetterUrl": "https://raw.githubusercontent.com/DanyalSarwar325/resume/main/Danyal_CoverLetter.pdf",
   "currentAddress": {
     "street": "123 Main Street",
     "city": "San Francisco",
