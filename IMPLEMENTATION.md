@@ -17,7 +17,7 @@ Built using **plain JavaScript** (no frameworks) for the following reasons:
 - Simpler packaging and submission (no `dist/` folder or bundler required)
 
 ### Architecture
-The extension follows a clean 3-file separation:
+The extension follows a clean separation of concerns:
 
 ```
 popup.html / popup.css / popup.js  → User interface (click to trigger)
@@ -28,10 +28,11 @@ data.json                           → User profile data
 
 ### Autofill Strategy
 1. User clicks **"Autofill Now"** in the popup
-2. `popup.js` injects `content.js` into the active tab via `chrome.scripting.executeScript`
-3. `content.js` loads `data.json` via `chrome.runtime.getURL`
-4. Fields are filled sequentially with appropriate delays between dropdowns
-5. File uploads (resume, cover letter) are fetched via `background.js` to bypass CORS
+2. `popup.js` injects `content.js` into the active tab via `chrome.scripting.executeScript` and sends an `autofill` message
+3. `content.js` is also registered in `manifest.json` as a content script for the target Eightfold URL
+4. `content.js` loads `data.json` via `chrome.runtime.getURL`
+5. Fields are filled sequentially; dropdown helpers wait for options to render before selecting
+6. File uploads (resume, cover letter) are fetched via `background.js` and reconstructed with `DataTransfer`
 
 ### Field Detection
 Used Chrome DevTools to inspect each field and identify stable selectors in this priority order:
@@ -130,7 +131,7 @@ https://raw.githubusercontent.com/USERNAME/REPO/main/resume.pdf
 ### 7. Service Worker Going Inactive
 **Problem:** Chrome kills the background service worker after a few seconds of inactivity, causing "Receiving end does not exist" errors.
 
-**Solution:** Eliminated reliance on background.js for message routing. The popup now directly injects `content.js` using `chrome.scripting.executeScript` before sending any messages.
+**Solution:** The popup now injects `content.js` using `chrome.scripting.executeScript` before sending messages, improving reliability when no content listener is active yet. The background service worker is still used for file-fetching (`fetchResume`) only.
 
 ---
 
@@ -142,7 +143,6 @@ https://raw.githubusercontent.com/USERNAME/REPO/main/resume.pdf
 function boolToYesNo(value)      // true → "Yes", false → "No"
 function mapWorkPreference(value) // "hybrid" → "Hybrid, 2-3 days in office"
 function mapVeteranStatus(value)  // "Not a Veteran" → "not a protected veteran"
-function mapDisabilityStatus(value) // "No" → partial match on full text
 ```
 
 
@@ -150,7 +150,7 @@ function mapDisabilityStatus(value) // "No" → partial match on full text
 ### 9. Dropdown Options Interfering With Each Other
 **Problem:** Opening one dropdown left residual `[role="option"]` elements in the DOM, causing the next `fillDropdown` call to click the wrong option.
 
-**Solution:** Added 400ms delays after each dropdown selection, and each `fillDropdown` call returns immediately after the first match is clicked.
+**Solution:** `fillDropdown()` waits for options to render (600ms), tries exact match first, then partial match, and returns immediately after the first successful click to avoid double-selection.
 
 ---
 
@@ -159,7 +159,7 @@ function mapDisabilityStatus(value) // "No" → partial match on full text
 - **Date Picker Fields:** The disability form date field uses a calendar dialog (`aria-haspopup="dialog"`) which cannot be reliably automated via DOM injection. The user must select this date manually.
 - **Multi-Step Navigation:** The extension fills all visible fields on the current step. The user must manually click "Next" to proceed between steps. Automatic step navigation was not implemented.
 
-- **Resume/Cover Letter URL:** Files must be hosted at a publicly accessible, CORS-friendly URL (e.g., GitHub raw). Google Drive direct download links are not supported due to CORS restrictions.
+- **Resume/Cover Letter URL:** Files must be hosted at a publicly accessible direct-download URL (e.g., GitHub raw). Many Google Drive sharing links return HTML instead of the file binary, which breaks upload automation.
 
 ---
 
